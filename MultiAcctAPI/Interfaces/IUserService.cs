@@ -6,5 +6,6 @@ namespace MultiAcctAPI.Services.Interfaces
     {
         User Register(User user);
         User Authenticate(string email, string password);
+        IEnumerable<User> GetAllUsers();
     }
 }

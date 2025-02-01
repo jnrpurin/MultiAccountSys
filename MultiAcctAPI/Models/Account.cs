@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace MultiAcctAPI.Models
 {
     public class Account
     {
         [Key]
+        [JsonIgnore]
         public Guid AccountId { get; set; }
 
         [Required]
