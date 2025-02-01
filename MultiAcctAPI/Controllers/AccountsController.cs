@@ -34,6 +34,11 @@ namespace MultiAcctAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Get an account by account ID
+        /// </summary>
+        /// <param name="accountId">Account identification guid</param>
+        /// <returns>The found account</returns>
         [HttpGet("{accountId}")]
         public ActionResult<Account> GetAccountById(Guid accountId)
         {
@@ -51,6 +56,11 @@ namespace MultiAcctAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Create a new account
+        /// </summary>
+        /// <param name="account">The account information</param>
+        /// <returns>The account created</returns>
         [HttpPost]
         public ActionResult<Account> CreateAccount(Account account)
         {
@@ -65,6 +75,12 @@ namespace MultiAcctAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Update an account
+        /// </summary>
+        /// <param name="accountId">Account identification guid</param>
+        /// <param name="account">The account information</param>
+        /// <returns>Message action response for success or fail</returns>
         [HttpPut("{accountId}")]
         public IActionResult UpdateAccount(Guid accountId, Account account)
         {
@@ -74,7 +90,7 @@ namespace MultiAcctAPI.Controllers
             try
             {
                 _accountService.UpdateAccount(account);
-                return NoContent();
+                return Ok(new {Success = "Account updated successfully."});
             }
             catch (Exception ex)
             {
@@ -82,13 +98,18 @@ namespace MultiAcctAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete an account
+        /// </summary>
+        /// <param name="accountId">Account identification guid</param>
+        /// <returns>Message action response for success or fail</returns>
         [HttpDelete("{accountId}")]
         public IActionResult DeleteAccount(Guid accountId)
         {
             try
             {
                 _accountService.DeleteAccount(accountId);
-                return NoContent();
+                return Ok(new {Success = "Account deleted successfully."});
             }
             catch (Exception ex)
             {

@@ -11,12 +11,12 @@ namespace MultiAcctAPI.Services
     public class UserService : IUserService
     {
         private readonly AppDBContext _context;
-        private readonly string _secret;
+        private readonly IConfiguration _configuration;
 
         public UserService(AppDBContext context, IConfiguration configuration)
         {
             _context = context;
-            _secret = configuration.GetValue<string>("JwtSecret");
+            _configuration = configuration;
         }
 
         public User Register(User user)
@@ -36,15 +36,22 @@ namespace MultiAcctAPI.Services
                 return null;
 
             // Generate JWT token
+            var jwtSettings = _configuration.GetSection("JWTSecrets");
+            var key = Encoding.ASCII.GetBytes(jwtSettings["JwtSecret"]);
+            var issuer = jwtSettings["JwtIssuer"];
+            var audience = jwtSettings["JwtAudience"];
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("Ptt8Ri2GTXeuq1BmM4RHS0StgQ4QofEAVsyrHaPOHMA="); // Encoding.ASCII.GetBytes("3yJ2bG9yZSBpcCBzdWNoIGFuIGF3ZXNvbWUgc2VjcmV0IGtleQ==");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserId.ToString())
+                    new (ClaimTypes.Name, user.UserId.ToString()),
+                    new (ClaimTypes.Email, user.Email),
+                    new (ClaimTypes.Role, "Admin")
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(10),
+                Issuer = issuer,
+                Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

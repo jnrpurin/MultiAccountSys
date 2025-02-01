@@ -15,7 +15,17 @@ namespace MultiAcctAPI.Services
 
         public IEnumerable<Account> GetAccountsByUserId(Guid userId)
         {
-            return _context.Accounts.Where(a => a.UserId == userId).ToList();
+            return _context.Accounts
+                .Where(a => a.UserId == userId)
+                .Select(a => new Account
+                {
+                    AccountId = a.AccountId,
+                    AccountName = a.AccountName,
+                    CreationDate = a.CreationDate,
+                    CurrentBalance = a.CurrentBalance,
+                    UserId = a.UserId
+                })
+                .ToList();
         }
 
         public Account GetAccountById(Guid accountId)

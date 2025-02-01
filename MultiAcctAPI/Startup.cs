@@ -7,13 +7,21 @@ using MultiAcctAPI.Services.Interfaces;
 using MultiAcctAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+
+    public Startup(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
-        services.AddAuthorization();
 
         services.AddDbContext<AppDBContext>(options =>
             options.UseInMemoryDatabase("InMemoryDb"));
@@ -21,11 +29,20 @@ public class Startup
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<IAccountService, AccountService>();
 
+        services.Configure<JsonOptions>(options =>
+        {
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+        });
+
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
        
         // JWT Authentication
-        var key = Encoding.ASCII.GetBytes("Ptt8Ri2GTXeuq1BmM4RHS0StgQ4QofEAVsyrHaPOHMA=");
+        var jwtSettings = _configuration.GetSection("JWTSecrets");
+        var key = Encoding.ASCII.GetBytes(jwtSettings["JwtSecret"]);
+        var issuer = jwtSettings["JwtIssuer"];
+        var audience = jwtSettings["JwtAudience"];
         services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,15 +52,16 @@ public class Startup
         {
             x.RequireHttpsMetadata = false;
             x.SaveToken = true;
-            // x.Authority = "https://dev-ebfajvxxzdbofrvl.us.auth0.com";
-            // x.Audience = "https://dev-ebfajvxxzdbofrvl.us.auth0.com/api/v2/";
             x.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuerSigningKey = true,
-                ValidateIssuer = false,
-                ValidateAudience = false,
                 ValidateLifetime = true,
+                ValidIssuer = issuer, 
+                ValidateIssuer = true,
+                ValidAudience = audience, 
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key)
+
             };
         });
 
@@ -73,7 +91,7 @@ public class Startup
             });
             // c.ExampleFilters();
         });
-                // services.AddSwaggerExamplesFromAssemblyOf<Startup>();
+        // services.AddSwaggerExamplesFromAssemblyOf<Startup>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -85,6 +103,7 @@ public class Startup
 
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>

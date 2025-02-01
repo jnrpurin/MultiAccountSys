@@ -1,12 +1,15 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace MultiAcctAPI.Models
 {
+    [ExcludeFromCodeCoverage]
     public class Account
     {
         [Key]
-        [JsonIgnore]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid AccountId { get; set; }
 
         [Required]

@@ -12,6 +12,11 @@ namespace MultiAcctAPI.Controllers
     {
         private readonly IUserService _userService = userService;
 
+        /// <summary>
+        /// Register a new user
+        /// </summary>
+        /// <param name="user">User information</param>
+        /// <returns>Message action response for success or fail</returns>
         [HttpPost("registration")]
         [AllowAnonymous]
         // [SwaggerRequestExample(typeof(User), typeof(UserRegistrationExample))]
@@ -32,6 +37,11 @@ namespace MultiAcctAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Authenticate a user
+        /// </summary>
+        /// <param name="user">User information</param>
+        /// <returns>Message action response for success or fail</returns>
         [HttpPost("login")]
         [AllowAnonymous]
         public IActionResult Authenticate([FromBody] User user)
