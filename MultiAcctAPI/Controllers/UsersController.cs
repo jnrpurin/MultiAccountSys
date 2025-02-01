@@ -46,11 +46,19 @@ namespace MultiAcctAPI.Controllers
         [AllowAnonymous]
         public IActionResult Authenticate([FromBody] User user)
         {
-            var authenticatedUser = _userService.Authenticate(user.Email, user.Password);
-            if (authenticatedUser == null)
-                return Unauthorized(new { message = "Email or password is incorrect" });
-
-            return Ok(new { Token = authenticatedUser.Token });
+            try
+            {
+                var authenticatedUser = _userService.Authenticate(user.Email, user.Password);
+                return Ok(new { authenticatedUser.Token });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while registering the user.", details = ex.Message });
+            }            
         }
 
         /// <summary>

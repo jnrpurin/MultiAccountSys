@@ -111,6 +111,10 @@ namespace MultiAcctAPI.Controllers
                 _accountService.DeleteAccount(accountId);
                 return Ok(new {Success = "Account deleted successfully."});
             }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the account.", details = ex.Message });

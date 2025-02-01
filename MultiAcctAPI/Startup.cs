@@ -40,7 +40,13 @@ public class Startup
        
         // JWT Authentication
         var jwtSettings = _configuration.GetSection("JWTSecrets");
-        var key = Encoding.ASCII.GetBytes(jwtSettings["JwtSecret"]);
+        var jwtSecret = jwtSettings["JwtSecret"];
+        if (string.IsNullOrEmpty(jwtSecret))
+        {
+            throw new ArgumentNullException("JWT secret is not configured properly.");
+        }
+        
+        var key = Encoding.ASCII.GetBytes(jwtSecret);
         var issuer = jwtSettings["JwtIssuer"];
         var audience = jwtSettings["JwtAudience"];
         services.AddAuthentication(x =>

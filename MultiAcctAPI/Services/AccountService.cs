@@ -30,7 +30,7 @@ namespace MultiAcctAPI.Services
 
         public Account GetAccountById(Guid accountId)
         {
-            return _context.Accounts.SingleOrDefault(a => a.AccountId == accountId);
+            return _context.Accounts.FirstOrDefault(a => a.AccountId == accountId)!;
         }
 
         public Account CreateAccount(Account account)
@@ -57,6 +57,10 @@ namespace MultiAcctAPI.Services
             var account = GetAccountById(accountId);
             if (account != null)
             {
+                if (account.CurrentBalance != 0)
+                {
+                    throw new InvalidOperationException("Account current balance should be 0 (zero).");
+                }
                 _context.Accounts.Remove(account);
                 _context.SaveChanges();
             }

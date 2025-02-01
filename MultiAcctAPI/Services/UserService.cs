@@ -31,13 +31,12 @@ namespace MultiAcctAPI.Services
 
         public User Authenticate(string email, string password)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email == email && x.Password == password);
-            if (user == null)
-                return null;
+            var user = _context.Users.FirstOrDefault(x => x.Email == email && x.Password == password) ?? throw new InvalidOperationException("Email or password is incorrect.");
 
             // Generate JWT token
             var jwtSettings = _configuration.GetSection("JWTSecrets");
-            var key = Encoding.ASCII.GetBytes(jwtSettings["JwtSecret"]);
+            var jwtSecret = jwtSettings["JwtSecret"] ?? throw new InvalidOperationException("JWT Secret is not configured.");
+            var key = Encoding.ASCII.GetBytes(jwtSecret);
             var issuer = jwtSettings["JwtIssuer"];
             var audience = jwtSettings["JwtAudience"];
             var tokenHandler = new JwtSecurityTokenHandler();
