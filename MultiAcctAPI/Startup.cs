@@ -4,15 +4,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MultiAcctAPI.Services.Interfaces;
+using MultiAcctAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddControllers();
+        services.AddDbContext<AppDBContext>(options =>
+            options.UseInMemoryDatabase("InMemoryDb"));
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<IAccountService, AccountService>();
-        
+       
         // JWT Authentication
         var key = Encoding.ASCII.GetBytes("3yJ2bG9yZSBpcCBzdWNoIGFuIGF3ZXNvbWUgc2VjcmV0IGtleQ==");
         services.AddAuthentication(x =>
