@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MultiAcctAPI.Data;
 using MultiAcctAPI.Models;
 using MultiAcctAPI.Interfaces;
+using MultiAcctAPI.ModelsAuxiliary;
 
 namespace MultiAcctAPI.Services
 {
@@ -70,6 +71,27 @@ namespace MultiAcctAPI.Services
                 _context.Accounts.Remove(account);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<decimal> GetAccountBalanceAsync(Guid accountId)
+        {
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
+            if (account == null)
+                throw new InvalidOperationException("Account not found.");
+
+            return account.CurrentBalance;
+        }
+
+        public async Task<IEnumerable<AccountSummary>> GetUserAccountSummariesAsync(Guid userId)
+        {
+            return await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .Select(a => new AccountSummary
+                {
+                    AccountId = a.AccountId,
+                    Balance = a.CurrentBalance
+                })
+                .ToListAsync();
         }
     }
 }

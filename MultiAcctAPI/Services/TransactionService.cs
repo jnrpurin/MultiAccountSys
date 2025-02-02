@@ -2,6 +2,7 @@ using MultiAcctAPI.Data;
 using MultiAcctAPI.Models;
 using MultiAcctAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MultiAcctAPI.Enums;
 
 namespace MultiAcctAPI.Services
 {

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MultiAcctAPI.Services;
 using MultiAcctAPI.Interfaces;
 using MultiAcctAPI.Data;
-using Swashbuckle.AspNetCore.Filters;
 
 public class Startup
 {
@@ -96,9 +95,8 @@ public class Startup
                     }, Array.Empty<string>()
                 }
             });
-            // c.ExampleFilters();
+            c.EnableAnnotations();
         });
-        // services.AddSwaggerExamplesFromAssemblyOf<Startup>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

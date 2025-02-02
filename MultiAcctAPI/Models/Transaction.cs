@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using MultiAcctAPI.Enums;
 
 namespace MultiAcctAPI.Models
 {
@@ -22,11 +23,5 @@ namespace MultiAcctAPI.Models
 
         [Required]
         public DateTime TransactionDate { get; set; }
-    }
-
-    public enum TransactionType
-    {
-        Deposit,
-        Withdrawal
     }
 }

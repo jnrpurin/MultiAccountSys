@@ -1,4 +1,5 @@
 using MultiAcctAPI.Models;
+using MultiAcctAPI.ModelsAuxiliary;
 
 namespace MultiAcctAPI.Interfaces
 {
@@ -9,5 +10,7 @@ namespace MultiAcctAPI.Interfaces
         Task<Account> CreateAccountAsync(Account account);
         Task UpdateAccountAsync(Account account);
         Task DeleteAccountAsync(Guid accountId);
+        Task<decimal> GetAccountBalanceAsync(Guid accountId);
+        Task<IEnumerable<AccountSummary>> GetUserAccountSummariesAsync(Guid userId);
     }
 }

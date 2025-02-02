@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiAcctAPI.Models;
 using MultiAcctAPI.Interfaces;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace MultiAcctAPI.Controllers
 {
@@ -23,6 +24,10 @@ namespace MultiAcctAPI.Controllers
         /// <param name="transaction">Transaction information</param>
         /// <returns></returns>
         [HttpPost]
+        [SwaggerOperation(Summary = "Add a new transaction", Description = "Add a new transaction (Deposit or Withdrawal) to an account.")]
+        [SwaggerResponse(201, "Transaction added successfully", typeof(Transaction))]
+        [SwaggerResponse(400, "Invalid transaction request")]
+        [SwaggerResponse(500, "An error occurred while processing the transaction")]
         public async Task<ActionResult<Transaction>> AddTransaction(Transaction transaction)
         {
             try
@@ -46,6 +51,9 @@ namespace MultiAcctAPI.Controllers
         /// <param name="accountId">Account identification code</param>
         /// <returns>Transactions of the specific account</returns>
         [HttpGet("account/{accountId}")]
+        [SwaggerOperation(Summary = "Get transactions by account ID", Description = "Retrieve a list of all transactions for a specific account.")]
+        [SwaggerResponse(200, "List of transactions retrieved successfully", typeof(IEnumerable<Transaction>))]
+        [SwaggerResponse(500, "An error occurred while retrieving transactions")]
         public async Task<IActionResult> GetTransactionsByAccountId(Guid accountId)
         {
             try
