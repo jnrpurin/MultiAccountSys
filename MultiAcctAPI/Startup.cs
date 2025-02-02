@@ -28,6 +28,7 @@ public class Startup
 
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<IAccountService, AccountService>();
+        services.AddSingleton<ITransactionService, TransactionService>();
 
         services.Configure<JsonOptions>(options =>
         {
@@ -45,7 +46,7 @@ public class Startup
         {
             throw new ArgumentNullException("JWT secret is not configured properly.");
         }
-        
+
         var key = Encoding.ASCII.GetBytes(jwtSecret);
         var issuer = jwtSettings["JwtIssuer"];
         var audience = jwtSettings["JwtAudience"];

@@ -1,6 +1,6 @@
 # MultiAcctAPI
 
-This project is a RESTful API developed in C# using .NET 8, which allows users to manage multiple bank accounts. The API follows REST principles and includes documentation and functional tests using Swagger.
+This project is a RESTful API developed in C# using .NET 9, which allows users to manage multiple bank accounts. The API follows REST principles and includes documentation and functional tests using Swagger.
 
 ## How to Run
 
