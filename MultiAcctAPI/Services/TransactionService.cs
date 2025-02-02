@@ -1,8 +1,8 @@
-using MultiAcctAPI.Data;
-using MultiAcctAPI.Models;
-using MultiAcctAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MultiAcctAPI.Data;
 using MultiAcctAPI.Enums;
+using MultiAcctAPI.Interfaces;
+using MultiAcctAPI.Models;
 
 namespace MultiAcctAPI.Services
 {

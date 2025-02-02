@@ -1,11 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using MultiAcctAPI.Data;
+using MultiAcctAPI.Interfaces;
+using MultiAcctAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using MultiAcctAPI.Data;
-using MultiAcctAPI.Models;
-using MultiAcctAPI.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace MultiAcctAPI.Services
 {

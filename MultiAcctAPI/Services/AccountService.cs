@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MultiAcctAPI.Data;
-using MultiAcctAPI.Models;
 using MultiAcctAPI.Interfaces;
+using MultiAcctAPI.Models;
 using MultiAcctAPI.ModelsAuxiliary;
 
 namespace MultiAcctAPI.Services
@@ -30,7 +30,7 @@ namespace MultiAcctAPI.Services
                 .ToListAsync();
         }
 
-        public async Task<Account> GetAccountByIdAsync(Guid accountId)
+        public async Task<Account?> GetAccountByIdAsync(Guid accountId)
         {
             var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
             if (account == null)

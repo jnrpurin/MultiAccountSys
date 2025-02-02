@@ -25,9 +25,9 @@ public class Startup
         services.AddDbContext<AppDBContext>(options =>
             options.UseInMemoryDatabase("InMemoryDb"));
 
-        services.AddSingleton<IUserService, UserService>();
-        services.AddSingleton<IAccountService, AccountService>();
-        services.AddSingleton<ITransactionService, TransactionService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ITransactionService, TransactionService>();
 
         services.Configure<JsonOptions>(options =>
         {
