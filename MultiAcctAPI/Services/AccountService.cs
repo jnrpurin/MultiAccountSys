@@ -1,6 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using MultiAcctAPI.Data;
 using MultiAcctAPI.Models;
-using MultiAcctAPI.Services.Interfaces;
+using MultiAcctAPI.Interfaces;
 
 namespace MultiAcctAPI.Services
 {
@@ -13,9 +14,9 @@ namespace MultiAcctAPI.Services
             _context = context;
         }
 
-        public IEnumerable<Account> GetAccountsByUserId(Guid userId)
+        public async Task<IEnumerable<Account>> GetAccountsByUserIdAsync(Guid userId)
         {
-            return _context.Accounts
+            return await _context.Accounts
                 .Where(a => a.UserId == userId)
                 .Select(a => new Account
                 {
@@ -25,36 +26,41 @@ namespace MultiAcctAPI.Services
                     CurrentBalance = a.CurrentBalance,
                     UserId = a.UserId
                 })
-                .ToList();
+                .ToListAsync();
         }
 
-        public Account GetAccountById(Guid accountId)
+        public async Task<Account> GetAccountByIdAsync(Guid accountId)
         {
-            return _context.Accounts.FirstOrDefault(a => a.AccountId == accountId)!;
-        }
-
-        public Account CreateAccount(Account account)
-        {
-            account.AccountId = Guid.NewGuid();
-            _context.Accounts.Add(account);
-            _context.SaveChanges();
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
+            if (account == null)
+            {
+                throw new KeyNotFoundException($"Account with ID {accountId} not found.");
+            }
             return account;
         }
 
-        public void UpdateAccount(Account account)
+        public async Task<Account> CreateAccountAsync(Account account)
         {
-            var existingAccount = GetAccountById(account.AccountId);
+            account.AccountId = Guid.NewGuid();
+            await _context.Accounts.AddAsync(account);
+            await _context.SaveChangesAsync();
+            return account;
+        }
+
+        public async Task UpdateAccountAsync(Account account)
+        {
+            var existingAccount = await GetAccountByIdAsync(account.AccountId);
             if (existingAccount != null)
             {
                 existingAccount.AccountName = account.AccountName;
                 existingAccount.CurrentBalance = account.CurrentBalance;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 
-        public void DeleteAccount(Guid accountId)
+        public async Task DeleteAccountAsync(Guid accountId)
         {
-            var account = GetAccountById(accountId);
+            var account = await GetAccountByIdAsync(accountId);
             if (account != null)
             {
                 if (account.CurrentBalance != 0)
@@ -62,7 +68,7 @@ namespace MultiAcctAPI.Services
                     throw new InvalidOperationException("Account current balance should be 0 (zero).");
                 }
                 _context.Accounts.Remove(account);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }

@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiAcctAPI.Models;
-using MultiAcctAPI.Services.Interfaces;
+using MultiAcctAPI.Interfaces;
 using Swashbuckle.AspNetCore.Filters;
+using System.Threading.Tasks;
 
 namespace MultiAcctAPI.Controllers
 {
@@ -20,11 +21,11 @@ namespace MultiAcctAPI.Controllers
         [HttpPost("registration")]
         [AllowAnonymous]
         // [SwaggerRequestExample(typeof(User), typeof(UserRegistrationExample))]
-        public IActionResult Register(User user)
+        public async Task<ActionResult<User>> Register(User user)
         {
             try
             {
-                var newUser = _userService.Register(user);
+                var newUser = await _userService.RegisterAsync(user);
                 return CreatedAtAction(nameof(Register), new { id = newUser.UserId }, newUser);
             }
             catch (InvalidOperationException ex)
@@ -44,11 +45,11 @@ namespace MultiAcctAPI.Controllers
         /// <returns>Message action response for success or fail</returns>
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult Authenticate([FromBody] User user)
+        public async Task<IActionResult> Authenticate([FromBody] User user)
         {
             try
             {
-                var authenticatedUser = _userService.Authenticate(user.Email, user.Password);
+                var authenticatedUser = await _userService.AuthenticateAsync(user.Email, user.Password);
                 return Ok(new { authenticatedUser.Token });
             }
             catch (InvalidOperationException ex)
@@ -67,9 +68,9 @@ namespace MultiAcctAPI.Controllers
         /// <returns>Users from data base</returns>
         [HttpGet]
         [Authorize]
-        public IActionResult GetAllUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
-            var users = _userService.GetAllUsers();
+            var users = await _userService.GetAllUsersAsync();
             return Ok(users);
         }
     }

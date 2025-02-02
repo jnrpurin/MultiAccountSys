@@ -1,11 +1,11 @@
 using MultiAcctAPI.Models;
 
-namespace MultiAcctAPI.Services.Interfaces
+namespace MultiAcctAPI.Interfaces
 {
     public interface IUserService
     {
-        User Register(User user);
-        User Authenticate(string email, string password);
-        IEnumerable<User> GetAllUsers();
+        Task<User> RegisterAsync(User user);
+        Task<User> AuthenticateAsync(string email, string password);
+        Task<IEnumerable<User>> GetAllUsersAsync();
     }
 }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiAcctAPI.Models;
-using MultiAcctAPI.Services.Interfaces;
+using MultiAcctAPI.Interfaces;
 
 namespace MultiAcctAPI.Controllers
 {
@@ -17,12 +17,17 @@ namespace MultiAcctAPI.Controllers
             _transactionService = transactionService;
         }
 
+        /// <summary>
+        /// Add a new transaction
+        /// </summary>
+        /// <param name="transaction">Transaction information</param>
+        /// <returns></returns>
         [HttpPost]
-        public IActionResult AddTransaction(Transaction transaction)
+        public async Task<ActionResult<Transaction>> AddTransaction(Transaction transaction)
         {
             try
             {
-                var newTransaction = _transactionService.AddTransaction(transaction);
+                var newTransaction = await _transactionService.AddTransactionAsync(transaction);
                 return CreatedAtAction(nameof(AddTransaction), new { id = newTransaction.TransactionId }, newTransaction);
             }
             catch (InvalidOperationException ex)
@@ -35,12 +40,17 @@ namespace MultiAcctAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Get transactions by account ID
+        /// </summary>
+        /// <param name="accountId">Account identification code</param>
+        /// <returns>Transactions of the specific account</returns>
         [HttpGet("account/{accountId}")]
-        public IActionResult GetTransactionsByAccountId(Guid accountId)
+        public async Task<IActionResult> GetTransactionsByAccountId(Guid accountId)
         {
             try
             {
-                var transactions = _transactionService.GetTransactionsByAccountId(accountId);
+                var transactions = await _transactionService.GetTransactionsByAccountIdAsync(accountId);
                 return Ok(transactions);
             }
             catch (Exception ex)

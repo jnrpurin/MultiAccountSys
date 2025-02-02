@@ -1,6 +1,7 @@
 using MultiAcctAPI.Data;
 using MultiAcctAPI.Models;
-using MultiAcctAPI.Services.Interfaces;
+using MultiAcctAPI.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace MultiAcctAPI.Services
 {
@@ -13,9 +14,9 @@ namespace MultiAcctAPI.Services
             _context = context;
         }
 
-        public Transaction AddTransaction(Transaction transaction)
+        public async Task<Transaction> AddTransactionAsync(Transaction transaction)
         {
-            var account = _context.Accounts.FirstOrDefault(a => a.AccountId == transaction.AccountId);
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == transaction.AccountId);
             if (account == null)
                 throw new InvalidOperationException("Account not found.");
 
@@ -30,15 +31,15 @@ namespace MultiAcctAPI.Services
             transaction.TransactionId = Guid.NewGuid();
             transaction.TransactionDate = DateTime.UtcNow;
 
-            _context.Transactions.Add(transaction);
-            _context.SaveChanges();
+            await _context.Transactions.AddAsync(transaction);
+            await _context.SaveChangesAsync();
 
             return transaction;
         }
 
-        public IEnumerable<Transaction> GetTransactionsByAccountId(Guid accountId)
+        public async Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(Guid accountId)
         {
-            return _context.Transactions.Where(t => t.AccountId == accountId).ToList();
+            return await _context.Transactions.Where(t => t.AccountId == accountId).ToListAsync();
         }
     }
 }

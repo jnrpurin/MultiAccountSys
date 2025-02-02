@@ -1,10 +1,10 @@
 using MultiAcctAPI.Models;
 
-namespace MultiAcctAPI.Services.Interfaces
+namespace MultiAcctAPI.Interfaces
 {
     public interface ITransactionService
     {
-        Transaction AddTransaction(Transaction transaction);
-        IEnumerable<Transaction> GetTransactionsByAccountId(Guid accountId);
+        Task<Transaction> AddTransactionAsync(Transaction transaction);
+        Task<IEnumerable<Transaction>> GetTransactionsByAccountIdAsync(Guid accountId);
     }
 }

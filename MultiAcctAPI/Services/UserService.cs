@@ -4,7 +4,8 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MultiAcctAPI.Data;
 using MultiAcctAPI.Models;
-using MultiAcctAPI.Services.Interfaces;
+using MultiAcctAPI.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace MultiAcctAPI.Services
 {
@@ -19,19 +20,19 @@ namespace MultiAcctAPI.Services
             _configuration = configuration;
         }
 
-        public User Register(User user)
+        public async Task<User> RegisterAsync(User user)
         {
             if (_context.Users.Any(x => x.Email == user.Email))
                 throw new InvalidOperationException("A user with this email already exists.");
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
             return user;
         }
 
-        public User Authenticate(string email, string password)
+        public async Task<User> AuthenticateAsync(string email, string password)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email == email && x.Password == password) ?? throw new InvalidOperationException("Email or password is incorrect.");
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email && x.Password == password) ?? throw new InvalidOperationException("Email or password is incorrect.");
 
             // Generate JWT token
             var jwtSettings = _configuration.GetSection("JWTSecrets");
@@ -59,9 +60,9 @@ namespace MultiAcctAPI.Services
             return user;
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return _context.Users.ToList();
+            return await _context.Users.ToListAsync();
         }
     }
 }

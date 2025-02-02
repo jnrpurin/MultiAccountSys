@@ -1,15 +1,15 @@
-using Microsoft.OpenApi.Models;
-using MultiAcctAPI.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MultiAcctAPI.Services.Interfaces;
-using MultiAcctAPI.Data;
-using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MultiAcctAPI.Services;
+using MultiAcctAPI.Interfaces;
+using MultiAcctAPI.Data;
+using Swashbuckle.AspNetCore.Filters;
 
 public class Startup
 {
