@@ -1,10 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using MultiAcctAPI.Data;
+using MultiAcctAPI.Interfaces;
+using MultiAcctAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using MultiAcctAPI.Data;
-using MultiAcctAPI.Models;
-using MultiAcctAPI.Services.Interfaces;
 
 namespace MultiAcctAPI.Services
 {
@@ -19,25 +20,24 @@ namespace MultiAcctAPI.Services
             _configuration = configuration;
         }
 
-        public User Register(User user)
+        public async Task<User> RegisterAsync(User user)
         {
             if (_context.Users.Any(x => x.Email == user.Email))
                 throw new InvalidOperationException("A user with this email already exists.");
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
             return user;
         }
 
-        public User Authenticate(string email, string password)
+        public async Task<User> AuthenticateAsync(string email, string password)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email == email && x.Password == password);
-            if (user == null)
-                return null;
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email && x.Password == password) ?? throw new InvalidOperationException("Email or password is incorrect.");
 
             // Generate JWT token
             var jwtSettings = _configuration.GetSection("JWTSecrets");
-            var key = Encoding.ASCII.GetBytes(jwtSettings["JwtSecret"]);
+            var jwtSecret = jwtSettings["JwtSecret"] ?? throw new InvalidOperationException("JWT Secret is not configured.");
+            var key = Encoding.ASCII.GetBytes(jwtSecret);
             var issuer = jwtSettings["JwtIssuer"];
             var audience = jwtSettings["JwtAudience"];
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -60,9 +60,9 @@ namespace MultiAcctAPI.Services
             return user;
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            return _context.Users.ToList();
+            return await _context.Users.ToListAsync();
         }
     }
 }

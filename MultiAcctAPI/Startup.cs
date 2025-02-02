@@ -1,15 +1,14 @@
-using Microsoft.OpenApi.Models;
-using MultiAcctAPI.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MultiAcctAPI.Services.Interfaces;
-using MultiAcctAPI.Data;
-using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MultiAcctAPI.Services;
+using MultiAcctAPI.Interfaces;
+using MultiAcctAPI.Data;
 
 public class Startup
 {
@@ -26,8 +25,9 @@ public class Startup
         services.AddDbContext<AppDBContext>(options =>
             options.UseInMemoryDatabase("InMemoryDb"));
 
-        services.AddSingleton<IUserService, UserService>();
-        services.AddSingleton<IAccountService, AccountService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ITransactionService, TransactionService>();
 
         services.Configure<JsonOptions>(options =>
         {
@@ -40,7 +40,13 @@ public class Startup
        
         // JWT Authentication
         var jwtSettings = _configuration.GetSection("JWTSecrets");
-        var key = Encoding.ASCII.GetBytes(jwtSettings["JwtSecret"]);
+        var jwtSecret = jwtSettings["JwtSecret"];
+        if (string.IsNullOrEmpty(jwtSecret))
+        {
+            throw new ArgumentNullException("JWT secret is not configured properly.");
+        }
+
+        var key = Encoding.ASCII.GetBytes(jwtSecret);
         var issuer = jwtSettings["JwtIssuer"];
         var audience = jwtSettings["JwtAudience"];
         services.AddAuthentication(x =>
@@ -89,9 +95,8 @@ public class Startup
                     }, Array.Empty<string>()
                 }
             });
-            // c.ExampleFilters();
+            c.EnableAnnotations();
         });
-        // services.AddSwaggerExamplesFromAssemblyOf<Startup>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

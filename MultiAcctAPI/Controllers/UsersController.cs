@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiAcctAPI.Models;
-using MultiAcctAPI.Services.Interfaces;
-using Swashbuckle.AspNetCore.Filters;
+using MultiAcctAPI.Interfaces;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace MultiAcctAPI.Controllers
 {
@@ -19,12 +19,15 @@ namespace MultiAcctAPI.Controllers
         /// <returns>Message action response for success or fail</returns>
         [HttpPost("registration")]
         [AllowAnonymous]
-        // [SwaggerRequestExample(typeof(User), typeof(UserRegistrationExample))]
-        public IActionResult Register(User user)
+        [SwaggerOperation(Summary = "Register a new user", Description = "Register a new user with the provided information.")]
+        [SwaggerResponse(201, "User registered successfully", typeof(User))]
+        [SwaggerResponse(409, "A user with this email already exists")]
+        [SwaggerResponse(500, "An error occurred while registering the user")]
+        public async Task<ActionResult<User>> Register(User user)
         {
             try
             {
-                var newUser = _userService.Register(user);
+                var newUser = await _userService.RegisterAsync(user);
                 return CreatedAtAction(nameof(Register), new { id = newUser.UserId }, newUser);
             }
             catch (InvalidOperationException ex)
@@ -44,13 +47,25 @@ namespace MultiAcctAPI.Controllers
         /// <returns>Message action response for success or fail</returns>
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult Authenticate([FromBody] User user)
+        [SwaggerOperation(Summary = "Authenticate a user", Description = "Authenticate a user with the provided email and password.")]
+        [SwaggerResponse(200, "User authenticated successfully", typeof(User))]
+        [SwaggerResponse(401, "Email or password is incorrect")]
+        [SwaggerResponse(500, "An error occurred while authenticating the user")]
+        public async Task<IActionResult> Authenticate([FromBody] User user)
         {
-            var authenticatedUser = _userService.Authenticate(user.Email, user.Password);
-            if (authenticatedUser == null)
-                return Unauthorized(new { message = "Email or password is incorrect" });
-
-            return Ok(new { Token = authenticatedUser.Token });
+            try
+            {
+                var authenticatedUser = await _userService.AuthenticateAsync(user.Email, user.Password);
+                return Ok(new { authenticatedUser.Token });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while registering the user.", details = ex.Message });
+            }            
         }
 
         /// <summary>
@@ -59,10 +74,20 @@ namespace MultiAcctAPI.Controllers
         /// <returns>Users from data base</returns>
         [HttpGet]
         [Authorize]
-        public IActionResult GetAllUsers()
+        [SwaggerOperation(Summary = "Get all users", Description = "Retrieve a list of all users.")]
+        [SwaggerResponse(200, "List of users retrieved successfully", typeof(IEnumerable<User>))]
+        [SwaggerResponse(500, "An error occurred while retrieving the users")]
+        public async Task<IActionResult> GetAllUsers()
         {
-            var users = _userService.GetAllUsers();
-            return Ok(users);
+            try
+            {
+                var users = await _userService.GetAllUsersAsync();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while registering the user.", details = ex.Message });
+            }  
         }
     }
 }

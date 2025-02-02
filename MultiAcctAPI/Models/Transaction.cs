@@ -1,26 +1,27 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using MultiAcctAPI.Enums;
 
 namespace MultiAcctAPI.Models
 {
     [ExcludeFromCodeCoverage]
-    public class Account
+    public class Transaction
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid TransactionId { get; set; }
+
+        [Required]
         public Guid AccountId { get; set; }
 
         [Required]
-        public required string AccountName { get; set; }
+        public decimal Amount { get; set; }
 
         [Required]
-        public decimal CurrentBalance { get; set; } = 0;
+        public TransactionType Type { get; set; } // "Deposit" or "Withdrawal"
 
         [Required]
-        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
-
-        [Required]
-        public Guid UserId { get; set; }
+        public DateTime TransactionDate { get; set; }
     }
 }
